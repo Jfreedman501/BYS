@@ -1,0 +1,54 @@
+* {
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sticky-nav {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    height: 100vh;
+  }
+  
+  .main-content {
+    padding-top: 60px; /* Adjust the top padding to accommodate the sticky nav */
+    height: 100vh;
+  }
+  
+  .main-content p {
+    margin-bottom: 20px;
+  }
+  
+  .vertical-rule {
+    border-left: 1px solid #dee2e6; /* Adjust the color as needed */
+    height: 100vh;
+  }
+  
+  .nav-title {
+    font-family: "Bahnschrift SemiBold", Arial, sans-serif;
+    font-size: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .nav-link {
+    text-align: center;
+  }
+  
+  .nav-item + .nav-item {
+    margin-top: 10px;
+  }
+
+  .nav-link {
+      text-align: center;
+      position: relative;
+      transition: background-color 0.3s ease;
+  }
+
+  .nav-link:hover {
+      background-color: rgba(0, 0, 0, 0.1); /* Adjust the background color as desired */
+      border-radius: 10px;
+  }
+  .spacer {
+      flex-grow: .7;
+  }
