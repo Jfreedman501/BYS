@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="stylesheet.css">
+    <style>
+      .main-content {
+        padding-top: 60px; /* Adjust the top padding to accommodate the sticky nav */
+        height: 85vh;
+      }
+      .main-title {
+        font-family: "Bahnschrift SemiBold", Arial, sans-serif;
+        font-size: 36px;
+        margin-bottom: 20px;
+      }
+      .form-group-column {
+        display: flex;
+        flex-direction: column;
+      }
+      .error {
+        color: red;
+        font-size: 14px;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-2 sticky-nav d-flex flex-column justify-content-center align-items-center">
+          <h1 class="nav-title">BackYourself</h1>
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link" href="#">Following</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="cats.html">Polls by Category</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Search</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Profile</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="create.html">+ Create New</a>
+            </li>
+          </ul>
+          <div class="spacer"></div>
+          <button class="btn btn-light">Logout</button>
+        </div>
+        <div class="col-1 vertical-rule"></div>
+        <div class="col-8 main-content d-flex flex-column justify-content-center align-items-center">
+          <h1 class="main-title">Create a Poll</h1>
+
+          <div class="row">
+            <div class="col-4 form-group-column">
+              <!-- Toggle Button for Number of Choices -->
+              <div class="form-group">
+                <label for="numberOfChoices">Number of Choices:</label>
+                <select class="form-control" id="numberOfChoices">
+                  <option value="2" selected>2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                </select>
+              </div>
+
+              <!-- Image Upload Buttons -->
+              <div id="imageUpload">
+                <label for="choice1Image">Choice 1 Image:</label>
+                <input type="file" id="choice1Image" name="choice1Image" accept="image/*"><br>
+
+                <label for="choice2Image">Choice 2 Image:</label>
+                <input type="file" id="choice2Image" name="choice2Image" accept="image/*"><br>
+
+                <!-- Additional Image Upload Buttons will be added dynamically -->
+              </div>
+            </div>
+            <div class="col-8">
+              <!-- Poll Title -->
+              <div class="form-group">
+                <label for="pollTitle">Poll Title (50 characters max):</label>
+                <input type="text" class="form-control" id="pollTitle" maxlength="50">
+                <div id="titleError" class="error"></div>
+              </div>
+
+              <!-- Poll Description -->
+              <div class="form-group">
+                <label for="pollDescription">Poll Description (500 characters max):</label>
+                <textarea class="form-control" id="pollDescription" rows="3" maxlength="500"></textarea>
+              </div>
+
+              <!-- Category -->
+              <div class="form-group">
+                <label for="category">Category:</label>
+                <select class="form-control" id="category">
+                  <option value="" selected disabled>Select a category</option>
+                  <option value="Category 1">Sports</option>
+                  <option value="Category 2">Music</option>
+                  <option value="Category 3">Movies</option>
+                  <option value="Category 4">TV</option>
+                  <option value="Category 5">Gaming</option>
+                  <option value="Category 6">Food</option>
+                  <option value="Category 7">Politics</option>
+                  <option value="Category 8">Fashion</option>
+                  <option value="Category 9">Fitness</option>
+                  <option value="Category 10">Literature</option>
+                  <option value="Category 11">Travel</option>
+                  <option value="Category 12">Arts</option>
+                  <option value="Category 13">History</option>
+                  <option value="Category 14">Animals</option>
+                  <option value="Category 15">Business</option>
+                  <option value="Category 16">Home + Decor</option>
+                  <option value="Category 17">Random</option>
+                  <!-- Add more category options here -->
+                </select>
+                <div id="categoryError" class="error"></div>
+              </div>
+
+              <!-- Subcategory -->
+              <div class="form-group">
+                <label for="subcategory">Subcategory:</label>
+                <select class="form-control" id="subcategory">
+                  <option value="" selected disabled>Select a subcategory</option>
+                  <!-- Subcategory options will be added dynamically based on the selected category -->
+                </select>
+                <div id="subcategoryError" class="error"></div>
+              </div>
+            </div>
+          </div>
+          <div id="submitButtonError" class="error"></div>
+          <button class="btn btn-primary" id="submitButton">Submit</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        var numberOfChoicesSelect = document.getElementById("numberOfChoices");
+        var imageUploadContainer = document.getElementById("imageUpload");
+        var categorySelect = document.getElementById("category");
+        var subcategorySelect = document.getElementById("subcategory");
+        var titleInput = document.getElementById("pollTitle");
+        var submitButton = document.getElementById("submitButton");
+
+        numberOfChoicesSelect.addEventListener("change", function() {
+          var numChoices = parseInt(numberOfChoicesSelect.value);
+
+          // Clear existing image upload fields
+          imageUploadContainer.innerHTML = "";
+
+          // Add image upload fields based on the selected number of choices
+          for (var i = 1; i <= numChoices; i++) {
+            var label = document.createElement("label");
+            label.textContent = "Choice " + i + " Image:";
+            imageUploadContainer.appendChild(label);
+
+            var input = document.createElement("input");
+            input.type = "file";
+            input.id = "choice" + i + "Image";
+            input.name = "choice" + i + "Image";
+            input.accept = "image/*";
+            imageUploadContainer.appendChild(input);
+
+            var br = document.createElement("br");
+            imageUploadContainer.appendChild(br);
+          }
+        });
+
+        categorySelect.addEventListener("change", function() {
+          var selectedCategory = categorySelect.value;
+
+          // Clear existing subcategory options
+          subcategorySelect.innerHTML = "";
+
+          // Add subcategory options based on the selected category
+          if (selectedCategory === "Category 1") {
+            addSubcategoryOption("Football");
+            addSubcategoryOption("Basketball");
+            addSubcategoryOption("Soccer");
+            addSubcategoryOption("Baseball");
+            addSubcategoryOption("Tennis");
+            addSubcategoryOption("Golf");
+            addSubcategoryOption("Cricket");
+            addSubcategoryOption("Olympics");
+            addSubcategoryOption("F1");
+            addSubcategoryOption("MMA");
+            addSubcategoryOption("Other");
+            // Add more subcategory options for Category 1
+          } else if (selectedCategory === "Category 2") {
+            addSubcategoryOption("Pop");
+            addSubcategoryOption("Rock");
+            addSubcategoryOption("Hip-hop + Rap");
+            addSubcategoryOption("Country");
+            addSubcategoryOption("R&B + Soul");
+            addSubcategoryOption("Classical");
+            addSubcategoryOption("Jazz");
+            addSubcategoryOption("EDM");
+            addSubcategoryOption("Other");
+            // Add more subcategory options for Category 2
+          } else if (selectedCategory === "Category 3") {
+            addSubcategoryOption("Actors");
+            addSubcategoryOption("Movies");
+            addSubcategoryOption("Characters");
+            addSubcategoryOption("Marvel");
+            addSubcategoryOption("Star Wars");
+            addSubcategoryOption("Pixar");
+            addSubcategoryOption("Horror");
+            addSubcategoryOption("Disney");
+            addSubcategoryOption("Other");
+            // Add more subcategory options for Category 3
+          } else if (selectedCategory === "Category 4") {
+            addSubcategoryOption("Actors");
+            addSubcategoryOption("Shows");
+            addSubcategoryOption("Characters");
+            addSubcategoryOption("Networks");
+            addSubcategoryOption("Reality Shows");
+            addSubcategoryOption("Others");
+            // Add more subcategory options for Category 4
+          } else if (selectedCategory === "Category 5") {
+            addSubcategoryOption("Board Games");
+            addSubcategoryOption("Card Games");
+            addSubcategoryOption("Video Games");
+            addSubcategoryOption("Pokemon");
+            addSubcategoryOption("Mario");
+            addSubcategoryOption("Minecraft");
+            addSubcategoryOption("Consoles");
+            addSubcategoryOption("Other");
+            // Add more subcategory options for Category 5
+          } else if (selectedCategory === "Category 6") {
+            addSubcategoryOption("Desserts");
+            addSubcategoryOption("Italian Cuisine");
+            addSubcategoryOption("Asian Cuisine");
+            addSubcategoryOption("Mexican Cuisine");
+            addSubcategoryOption("Vegetarian + Vegan");
+            addSubcategoryOption("Healthy Eating");
+            addSubcategoryOption("Fast Food");
+            addSubcategoryOption("Other");
+            // Add more subcategory options for Category 6
+          } else if (selectedCategory === "Category 7") {
+            addSubcategoryOption("U.S. Politics");
+            addSubcategoryOption("International Politics");
+            addSubcategoryOption("Political Ideologies");
+            addSubcategoryOption("Political Figures");
+            addSubcategoryOption("Political Activism");
+            addSubcategoryOption("Other");
+            // Add more subcategory options for Category 7
+          } else if (selectedCategory === "Category 8") {
+            addSubcategoryOption("Clothing Styles");
+            addSubcategoryOption("Accessories");
+            addSubcategoryOption("Designers");
+            addSubcategoryOption("Trends");
+            addSubcategoryOption("Beauty + Makeup");
+            addSubcategoryOption("Street Style");
+            addSubcategoryOption("Other");
+            // Add more subcategory options for Category 8
+          } else if (selectedCategory === "Category 9") {
+            addSubcategoryOption("Cardio");
+            addSubcategoryOption("Strength Training");
+            addSubcategoryOption("Yoga & Pilates");
+            addSubcategoryOption("Workout Equipment");
+            addSubcategoryOption("Other");
+            // Add more subcategory options for Category 9
+          } else if (selectedCategory === "Category 10") {
+            addSubcategoryOption("Fiction");
+            addSubcategoryOption("Nonfiction");
+            addSubcategoryOption("Classic Literature");
+            addSubcategoryOption("Poetry");
+            addSubcategoryOption("Other");
+            // Add more subcategory options for Category 10
+          } else if (selectedCategory === "Category 11") {
+            addSubcategoryOption("Modes of Transport");
+            addSubcategoryOption("All Destinations");
+            addSubcategoryOption("Beach Vacations");
+            addSubcategoryOption("Budget Travel");
+            addSubcategoryOption("Other");
+            // Add more subcategory options for Category 11
+          } else if (selectedCategory === "Category 12") {
+            addSubcategoryOption("Painting");
+            addSubcategoryOption("Sculture");
+            addSubcategoryOption("Photography");
+            addSubcategoryOption("Digital Art");
+            addSubcategoryOption("Architecture");
+            addSubcategoryOption("Other");
+            // Add more subcategory options for Category 12
+          } else if (selectedCategory === "Category 13") {
+            addSubcategoryOption("Ancient History");
+            addSubcategoryOption("Medieval History");
+            addSubcategoryOption("World Wars");
+            addSubcategoryOption("Historical Figures");
+            addSubcategoryOption("Historical Events");
+            addSubcategoryOption("Other");
+            // Add more subcategory options for Category 13
+          } else if (selectedCategory === "Category 14") {
+            addSubcategoryOption("Pets");
+            addSubcategoryOption("Land Animals");
+            addSubcategoryOption("Sea Animals");
+            addSubcategoryOption("Other");
+            // Add more subcategory options for Category 14
+          } else if (selectedCategory === "Category 15") {
+            addSubcategoryOption("Entepreneurship");
+            addSubcategoryOption("Startups");
+            addSubcategoryOption("Marketing + Advertising");
+            addSubcategoryOption("Finance");
+            addSubcategoryOption("Leadership");
+            addSubcategoryOption("Other");
+            // Add more subcategory options for Category 15
+          } else if (selectedCategory === "Category 16") {
+            addSubcategoryOption("Interior Design");
+            addSubcategoryOption("DIY Projects");
+            addSubcategoryOption("Home Organization");
+            addSubcategoryOption("Home Renovation");
+            addSubcategoryOption("Furniture + Accessories");
+            addSubcategoryOption("Gardening");
+            addSubcategoryOption("Other");
+            // Add more subcategory options for Category 16
+          } else if (selectedCategory === "Category 17") {
+            addSubcategoryOption("All Quizzes");
+            // Add more subcategory options for Category 17
+          }
+          // Add more category-specific subcategory options here
+
+          function addSubcategoryOption(subcategory) {
+            var option = document.createElement("option");
+            option.value = subcategory;
+            option.textContent = subcategory;
+            subcategorySelect.appendChild(option);
+          }
+        });
+
+        submitButton.addEventListener("click", function(event) {
+          event.preventDefault();
+          clearErrors();
+
+          var numChoices = parseInt(numberOfChoicesSelect.value);
+          var imageInputs = [];
+          var title = titleInput.value.trim();
+          var category = categorySelect.value;
+          var subcategory = subcategorySelect.value;
+
+          // Get the selected image inputs
+          for (var i = 1; i <= numChoices; i++) {
+            var inputId = "choice" + i + "Image";
+            var input = document.getElementById(inputId);
+            imageInputs.push(input);
+          }
+
+          var hasValidImages = validateImages(imageInputs);
+          var hasValidTitle = validateTitle(title);
+          var hasValidCategory = validateCategory(category);
+          var hasValidSubcategory = validateSubcategory(subcategory);
+
+          if (hasValidImages && hasValidTitle && hasValidCategory && hasValidSubcategory) {
+            // Form is valid, proceed with submission
+            console.log("Form submitted successfully!");
+          } else {
+            // Form is invalid, display error messages
+            if (!hasValidImages) {
+              displayError("Please upload " + numChoices + " images.");
+            }
+            if (!hasValidTitle) {
+              displayError("Please enter a title.");
+            }
+            if (!hasValidCategory) {
+              displayError("Please select a category.");
+            }
+            if (!hasValidSubcategory) {
+              displayError("Please select a subcategory.");
+            }
+          }
+        });
+
+        function validateImages(inputs) {
+          var numChoices = parseInt(numberOfChoicesSelect.value);
+          var count = 0;
+
+          for (var i = 0; i < inputs.length; i++) {
+            if (inputs[i].files.length > 0) {
+              count++;
+            }
+          }
+
+          return count === numChoices;
+        }
+
+        function validateTitle(title) {
+          return title.length > 0;
+        }
+
+        function validateCategory(category) {
+          return category.length > 0;
+        }
+
+        function validateSubcategory(subcategory) {
+          return subcategory.length > 0;
+        }
+
+        function clearErrors() {
+          document.getElementById("submitButtonError").textContent = "";
+          document.getElementById("titleError").textContent = "";
+          document.getElementById("categoryError").textContent = "";
+          document.getElementById("subcategoryError").textContent = "";
+        }
+
+        function displayError(message) {
+          var errorContainer = document.getElementById("submitButtonError");
+          var errorElement = document.createElement("div");
+          errorElement.classList.add("error-message");
+          errorElement.textContent = message;
+          errorContainer.appendChild(errorElement);
+        }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-+XOD1UoA3+h8N4Y4hU4UtiMnxSreF4g1IpbAxQTVHs8Vm1sZpVDq3LlMhcr30QlP" crossorigin="anonymous"></script>
+  </body>
+</html>

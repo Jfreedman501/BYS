@@ -25,7 +25,7 @@
               <a class="nav-link" href="#">Profile</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">+ Create New</a>
+              <a class="nav-link" href="create.html">+ Create New</a>
             </li>
           </ul>
           <div class="spacer"></div>
@@ -52,6 +52,7 @@
             <button id="button-14" class="btn btn-primary" onclick="selectButton(14)">Animals</button>
             <button id="button-15" class="btn btn-primary" onclick="selectButton(15)">Business</button>
             <button id="button-16" class="btn btn-primary" onclick="selectButton(16)">Home + Decor</button>
+            <button id="button-17" class="btn btn-primary" onclick="selectButton(17)">Random</button>
             <!-- Add more buttons as needed -->
           </div>
           <button class="btn btn-light mt-3" onclick="submitForm()">Submit</button>
@@ -128,6 +129,9 @@
               break;
             case "16":
               categoryName = "home";
+              break;
+            case "17":
+              categoryName = "random";
               break;
             default:
               categoryName = ""; // Set default category name
