@@ -10,7 +10,6 @@ if (!isset($_SESSION['user_id'])) {
 
 ?>
 
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -56,7 +55,7 @@ if (!isset($_SESSION['user_id'])) {
 
 
 
-          <p>FOLLOWING PAGE</p>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
 
 
 

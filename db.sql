@@ -30,7 +30,8 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
   num_polls_posted INT DEFAULT 0,
   num_followers INT DEFAULT 0,
-  bio VARCHAR(500)
+  bio VARCHAR(500),
+  profile_picture VARCHAR(255)
 );
 
 -- Table: polls

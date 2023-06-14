@@ -1,6 +1,6 @@
 <?php
 // login.php
-
+session_start();
 // Assuming you have established the database connection
 // Replace the placeholders with your actual database credentials
 $servername = 'localhost';
@@ -38,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (password_verify($password, $storedPassword)) {
             // Password is correct, log in the user
             // Perform any additional actions or set session variables
-
+            $_SESSION['user_id'] = $row['user_id'];
             // Redirect the user to following.php
             header("Location: following.php");
             exit();
@@ -143,7 +143,7 @@ $conn->close();
               </div>
               <hr class="divider">
               <div class="mb-3">
-                <p class="signup-text">New to BackYourself? <a href="signup.html">Sign up</a></p>
+                <p class="signup-text">New to BackYourself? <a href="signup.php">Sign up</a></p>
               </div>
             </form>
           </div>

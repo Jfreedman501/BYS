@@ -85,7 +85,7 @@
               <button type="submit" class="btn btn-primary signup-button">Sign Up</button>
               <hr class="divider">
               <div class="mb-3">
-                <p class="login-text">Already have an account? <a href="login.html">Log in</a></p>
+                <p class="login-text">Already have an account? <a href="login.php">Log in</a></p>
               </div>
             </form>
           </div>

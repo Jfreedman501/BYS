@@ -4,6 +4,13 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Start or resume the session
+session_start();
+
+// Destroy the existing session
+session_destroy();
+
+
 // Initialize the error message variable
 $errorMsg = "";
 
@@ -53,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $stmt->execute(['email' => $email, 'fullName' => $fullName, 'username' => $username, 'password' => $hashedPassword]);
 
           // Redirect the user to following.php
-          header("Location: following.php");
+          header("Location: edit_profile.php");
           exit();
         }
       }
