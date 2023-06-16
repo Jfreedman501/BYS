@@ -16,6 +16,7 @@ if (!isset($_SESSION['user_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link rel="stylesheet" href="stylesheet.css">
+    <title>Create New Poll - BackYourself</title>
     <style>
       .main-content {
         padding-top: 60px; /* Adjust the top padding to accommodate the sticky nav */
@@ -70,14 +71,15 @@ if (!isset($_SESSION['user_id'])) {
         </div>
         <div class="col-1 vertical-rule"></div>
         <div class="col-8 main-content d-flex flex-column justify-content-center align-items-center">
-          <h1 class="main-title">Create a Poll</h1>
-
+        <h1 class="main-title">Create a Poll</h1>
+        
+        <form action="create_poll_form.php" method="post" enctype="multipart/form-data">
           <div class="row">
             <div class="col-4 form-group-column">
               <!-- Toggle Button for Number of Choices -->
               <div class="form-group">
                 <label for="numberOfChoices">Number of Choices:</label>
-                <select class="form-control" id="numberOfChoices">
+                <select class="form-control" id="numberOfChoices" name="numberOfChoices">
                   <option value="2" selected>2</option>
                   <option value="3">3</option>
                   <option value="4">4</option>
@@ -99,20 +101,20 @@ if (!isset($_SESSION['user_id'])) {
               <!-- Poll Title -->
               <div class="form-group">
                 <label for="pollTitle">Poll Title (50 characters max):</label>
-                <input type="text" class="form-control" id="pollTitle" maxlength="50">
+                <input type="text" class="form-control" id="pollTitle" name="pollTitle" maxlength="50">
                 <div id="titleError" class="error"></div>
               </div>
 
               <!-- Poll Description -->
               <div class="form-group">
                 <label for="pollDescription">Poll Description (500 characters max):</label>
-                <textarea class="form-control" id="pollDescription" rows="3" maxlength="500"></textarea>
+                <textarea class="form-control" id="pollDescription" name="pollDescription" rows="3" maxlength="500"></textarea>
               </div>
 
               <!-- Category -->
               <div class="form-group">
                 <label for="category">Category:</label>
-                <select class="form-control" id="category">
+                <select class="form-control" id="category" name="category">
                   <option value="" selected disabled>Select a category</option>
                   <option value="Category 1">Sports</option>
                   <option value="Category 2">Music</option>
@@ -124,7 +126,7 @@ if (!isset($_SESSION['user_id'])) {
               <!-- Subcategory -->
               <div class="form-group">
                 <label for="subcategory">Subcategory:</label>
-                <select class="form-control" id="subcategory">
+                <select class="form-control" id="subcategory" name="subcategory">
                   <option value="" selected disabled>Select a subcategory</option>
                   <!-- Subcategory options will be added dynamically based on the selected category -->
                 </select>
@@ -134,6 +136,7 @@ if (!isset($_SESSION['user_id'])) {
           </div>
           <div id="submitButtonError" class="error"></div>
           <button class="btn btn-primary" id="submitButton">Submit</button>
+          </form>
         </div>
       </div>
     </div>
@@ -212,52 +215,47 @@ if (!isset($_SESSION['user_id'])) {
           }
         });
 
-        submitButton.addEventListener("click", function(event) {
-    event.preventDefault();
-    clearErrors();
+    submitButton.addEventListener("click", function(event) {
+        event.preventDefault();
+        clearErrors();
 
-    var numChoices = parseInt(numberOfChoicesSelect.value);
-    var imageInputs = [];
-    var title = titleInput.value.trim();
-    var category = categorySelect.value;
-    var subcategory = subcategorySelect.value;
+        var numChoices = parseInt(numberOfChoicesSelect.value);
+        var imageInputs = [];
+        var title = titleInput.value.trim();
+        var category = categorySelect.value;
+        var subcategory = subcategorySelect.value;
 
-    // Get the selected image inputs
-    for (var i = 1; i <= numChoices; i++) {
-      var inputId = "choice" + i + "Image";
-      var input = document.getElementById(inputId);
-      imageInputs.push(input);
-    }
+        // Get the selected image inputs
+        for (var i = 1; i <= numChoices; i++) {
+          var inputId = "choice" + i + "Image";
+          var input = document.getElementById(inputId);
+          imageInputs.push(input);
+        }
 
-    var hasValidImages = validateImages(imageInputs);
-    var hasValidTitle = validateTitle(title);
-    var hasValidCategory = validateCategory(category);
-    var hasValidSubcategory = validateSubcategory(subcategory);
+        var hasValidImages = validateImages(imageInputs);
+        var hasValidTitle = validateTitle(title);
+        var hasValidCategory = validateCategory(category);
+        var hasValidSubcategory = validateSubcategory(subcategory);
 
-    if (hasValidImages && hasValidTitle && hasValidCategory && hasValidSubcategory) {
-      // Form is valid, proceed with submission
-      // You can add code here to submit the form to following.php
-      // and pass the session's user_id as a parameter
-
-      // Example code for redirecting to following.php with user_id as a query parameter
-      var userId = "<?php echo $_SESSION['user_id']; ?>";
-      window.location.href = "following.php?user_id=" + userId;
-    } else {
-      // Form is invalid, display error messages
-      if (!hasValidImages) {
-        displayError("Please upload " + numChoices + " images.");
-      }
-      if (!hasValidTitle) {
-        displayError("Please enter a title.");
-      }
-      if (!hasValidCategory) {
-        displayError("Please select a category.");
-      }
-      if (!hasValidSubcategory) {
-        displayError("Please select a subcategory.");
-      }
-    }
-  });
+        if (hasValidImages && hasValidTitle && hasValidCategory && hasValidSubcategory) {
+            // Form is valid, proceed with submission
+            event.target.closest('form').submit();
+        } else {
+          // Form is invalid, display error messages
+          if (!hasValidImages) {
+            displayError("Please upload " + numChoices + " images.");
+          }
+          if (!hasValidTitle) {
+            displayError("Please enter a title.");
+          }
+          if (!hasValidCategory) {
+            displayError("Please select a category.");
+          }
+          if (!hasValidSubcategory) {
+            displayError("Please select a subcategory.");
+          }
+        }
+      });
 
 
         function validateImages(inputs) {
