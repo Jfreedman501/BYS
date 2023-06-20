@@ -42,6 +42,7 @@ if (isset($_GET['search'])) {
           integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
           crossorigin="anonymous">
     <link rel="stylesheet" href="stylesheet.css">
+    <title>Search - BackYourself</title>
     <style>
         .search-bar {
             width: 80%;

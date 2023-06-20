@@ -118,6 +118,20 @@ if (!isset($_SESSION['user_id'])) {
                   <option value="" selected disabled>Select a category</option>
                   <option value="Category 1">Sports</option>
                   <option value="Category 2">Music</option>
+                  <option value="Category 3">Movies</option>
+                  <option value="Category 4">TV</option>
+                  <option value="Category 5">Gaming</option>
+                  <option value="Category 6">Food</option>
+                  <option value="Category 7">Politics</option>
+                  <option value="Category 8">Fashion</option>
+                  <option value="Category 9">Fitness</option>
+                  <option value="Category 10">Literature</option>
+                  <option value="Category 11">Travel</option>
+                  <option value="Category 12">Arts</option>
+                  <option value="Category 13">History</option>
+                  <option value="Category 14">Animals</option>
+                  <option value="Category 15">Business</option>
+                  <option value="Category 16">Home + Decor</option>
                   <!-- Add more category options here -->
                 </select>
                 <div id="categoryError" class="error"></div>
@@ -192,7 +206,6 @@ if (!isset($_SESSION['user_id'])) {
             addSubcategoryOption("F1");
             addSubcategoryOption("MMA");
             addSubcategoryOption("Other");
-            // Add more subcategory options for Category 1
           } else if (selectedCategory === "Category 2") {
             addSubcategoryOption("Pop");
             addSubcategoryOption("Rock");
@@ -203,7 +216,109 @@ if (!isset($_SESSION['user_id'])) {
             addSubcategoryOption("Jazz");
             addSubcategoryOption("EDM");
             addSubcategoryOption("Other");
-            // Add more subcategory options for Category 2
+          } else if (selectedCategory === "Category 3") {
+            addSubcategoryOption("Actors");
+            addSubcategoryOption("Movies");
+            addSubcategoryOption("Characters");
+            addSubcategoryOption("Marvel");
+            addSubcategoryOption("Star Wars");
+            addSubcategoryOption("Pixar");
+            addSubcategoryOption("Horror");
+            addSubcategoryOption("Disney");
+            addSubcategoryOption("Other");
+          } else if (selectedCategory === "Category 4") {
+            addSubcategoryOption("Actors");
+            addSubcategoryOption("Shows");
+            addSubcategoryOption("Characters");
+            addSubcategoryOption("Networks");
+            addSubcategoryOption("Reality Shows");
+            addSubcategoryOption("Other");
+          } else if (selectedCategory === "Category 5") {
+            addSubcategoryOption("Board Games");
+            addSubcategoryOption("Card Games");
+            addSubcategoryOption("Video Games");
+            addSubcategoryOption("Pokemon");
+            addSubcategoryOption("Mario");
+            addSubcategoryOption("Minecraft");
+            addSubcategoryOption("Consoles");
+            addSubcategoryOption("Other");
+          } else if (selectedCategory === "Category 6") {
+            addSubcategoryOption("Desserts");
+            addSubcategoryOption("Italian Cuisine");
+            addSubcategoryOption("Asian Cuisine");
+            addSubcategoryOption("Mexican Cuisine");
+            addSubcategoryOption("Vegetarian + Vegan");
+            addSubcategoryOption("Healthy Eating");
+            addSubcategoryOption("Fast Food");
+            addSubcategoryOption("Other");
+          } else if (selectedCategory === "Category 7") {
+            addSubcategoryOption("U.S. Politics");
+            addSubcategoryOption("International Politics");
+            addSubcategoryOption("Political Ideologies");
+            addSubcategoryOption("Political Figures");
+            addSubcategoryOption("Political Activism");
+            addSubcategoryOption("Other");
+          } else if (selectedCategory === "Category 8") {
+            addSubcategoryOption("Cloting Styles");
+            addSubcategoryOption("Acessories");
+            addSubcategoryOption("Designers");
+            addSubcategoryOption("Trends");
+            addSubcategoryOption("Beauty + Makeup");
+            addSubcategoryOption("Street Style");
+            addSubcategoryOption("Other");
+          } else if (selectedCategory === "Category 9") {
+            addSubcategoryOption("Cardio");
+            addSubcategoryOption("Strength Training");
+            addSubcategoryOption("Hip-hop + Rap");
+            addSubcategoryOption("Yoga + Pilates");
+            addSubcategoryOption("Workout Equipment");
+            addSubcategoryOption("Other");
+          } else if (selectedCategory === "Category 10") {
+            addSubcategoryOption("Fiction");
+            addSubcategoryOption("Nonfiction");
+            addSubcategoryOption("Classic Literature");
+            addSubcategoryOption("Poetry");
+            addSubcategoryOption("Other");
+          } else if (selectedCategory === "Category 11") {
+            addSubcategoryOption("Modes of Transport");
+            addSubcategoryOption("All Destinations");
+            addSubcategoryOption("Beach Vacations");
+            addSubcategoryOption("Budget Travel");
+            addSubcategoryOption("Other");
+          } else if (selectedCategory === "Category 12") {
+            addSubcategoryOption("Painting");
+            addSubcategoryOption("Sculpture");
+            addSubcategoryOption("Photography");
+            addSubcategoryOption("Digital Art");
+            addSubcategoryOption("Architecture");
+            addSubcategoryOption("Other");
+          } else if (selectedCategory === "Category 13") {
+            addSubcategoryOption("Ancient History");
+            addSubcategoryOption("Medieval History");
+            addSubcategoryOption("World Wars");
+            addSubcategoryOption("Historical Figures");
+            addSubcategoryOption("Historical Events");
+            addSubcategoryOption("Other");
+          } else if (selectedCategory === "Category 14") {
+            addSubcategoryOption("Pets");
+            addSubcategoryOption("Land Animals");
+            addSubcategoryOption("Sea Animals");
+            addSubcategoryOption("Other");
+          } else if (selectedCategory === "Category 15") {
+            addSubcategoryOption("Entrepreneurship");
+            addSubcategoryOption("Startups");
+            addSubcategoryOption("Marketing + Advertising");
+            addSubcategoryOption("Finance");
+            addSubcategoryOption("Leadership");
+            addSubcategoryOption("Other");
+          } else if (selectedCategory === "Category 16") {
+            addSubcategoryOption("Interior Design");
+            addSubcategoryOption("DIY Projects");
+            addSubcategoryOption("Home Organization");
+            addSubcategoryOption("Home Renovation");
+            addSubcategoryOption("Furniture + Accessories");
+            addSubcategoryOption("Gardening");
+            addSubcategoryOption("Other");
           }
           // Add more category-specific subcategory options here
 

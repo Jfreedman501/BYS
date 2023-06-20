@@ -4,7 +4,6 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-
 session_start();
 
 // Check if the user is logged in
@@ -32,9 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $imageTempPath = $_FILES['choice' . ($i + 1) . 'Image']['tmp_name'];
         $imageName = $_FILES['choice' . ($i + 1) . 'Image']['name'];
         $imageDestinationPath = $destinationFolder . $imageName;
-        
+
         move_uploaded_file($imageTempPath, $imageDestinationPath);
-    
+
         // Add the image name to the $images array
         $images[] = $imageName;
     }
@@ -71,6 +70,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Execute the statement
     if ($stmt->execute()) {
         // Poll created successfully
+
+        // Update the num_polls_posted variable in the users table
+        $updateStmt = $pdo->prepare("UPDATE users SET num_polls_posted = num_polls_posted + 1 WHERE user_id = :user_id");
+        $updateStmt->bindParam(':user_id', $userId);
+        $updateStmt->execute();
+
         // You can redirect the user to a success page or perform any other desired action
         header("Location: following.php");
         exit();

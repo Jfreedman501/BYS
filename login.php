@@ -65,6 +65,7 @@ $conn->close();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Bahnschrift+SemiBold&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="stylesheet.css">
+    <title>Login - BackYourself</title>
     <style>
       .login-title {
         font-family: "Bahnschrift SemiBold", Arial, sans-serif;

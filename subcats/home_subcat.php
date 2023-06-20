@@ -54,34 +54,35 @@ if (!isset($_SESSION['user_id'])) {
 </head>
 
 <body>
-  <div class="container-fluid">
+<div class="container-fluid">
     <div class="row">
       <div class="col-2 sticky-nav d-flex flex-column justify-content-center align-items-center">
         <h1 class="nav-title">BackYourself</h1>
-        <li class="nav-item">
-          <a class="nav-link" href="../following.php">Following</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="../cats.php">Polls by Category</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="../search.php">Search</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="../profile.php">Profile</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="../create.php">+ Create New</a>
-        </li>
-      </ul>
-      <div class="spacer"></div>
-      <button class="btn btn-light" onclick="logout()">Logout</button>
-        <script>
-          function logout() {
-          // Make a GET request to logout.php
-          window.location.href = "../logout.php";
-          }
-        </script>
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="../following.php">Following</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../cats.php">Polls by Category</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../search.php">Search</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../profile.php">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../create.php">+ Create New</a>
+          </li>
+        </ul>
+        <div class="spacer"></div>
+        <button class="btn btn-light" onclick="logout()">Logout</button>
+          <script>
+            function logout() {
+            // Make a GET request to logout.php
+            window.location.href = "../logout.php";
+            }
+          </script>
       </div>
       <div class="col-1 vertical-rule"></div>
       <div class="col-8 main-content d-flex flex-column justify-content-center align-items-center">

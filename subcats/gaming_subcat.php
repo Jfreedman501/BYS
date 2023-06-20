@@ -11,7 +11,6 @@ if (!isset($_SESSION['user_id'])) {
 ?>
 
 
-
 <!doctype html>
 <html lang="en">
 
@@ -83,6 +82,7 @@ if (!isset($_SESSION['user_id'])) {
             window.location.href = "../logout.php";
             }
           </script>
+      </div>
       <div class="col-1 vertical-rule"></div>
       <div class="col-8 main-content d-flex flex-column justify-content-center align-items-center">
         <h2 class="category-text">Gaming Subcategories:</h2>
