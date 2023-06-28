@@ -149,8 +149,19 @@ if (!isset($_SESSION['user_id'])) {
     }
 
     function submitForm() {
-      window.location.href = "feed.html";
+      // Get the selected subcategories
+      const selectedSubcategories = selectedButtons.map(buttonId => {
+      const button = document.getElementById(`button-${buttonId}`);
+      return button.textContent.trim();
+    }).join(',');
+
+      // Construct the URL with the selected subcategories as query parameters
+      const url = `../feed.php?category=Music&subcategory=${encodeURIComponent(selectedSubcategories)}`;
+
+      // Redirect to the feed.php page
+      window.location.href = url;
     }
+
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"

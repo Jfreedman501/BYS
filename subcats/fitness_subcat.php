@@ -145,7 +145,17 @@ if (!isset($_SESSION['user_id'])) {
     }
 
     function submitForm() {
-      window.location.href = "feed.html";
+      // Get the selected subcategories
+      const selectedSubcategories = selectedButtons.map(buttonId => {
+      const button = document.getElementById(`button-${buttonId}`);
+      return button.textContent.trim();
+    }).join(',');
+
+      // Construct the URL with the selected subcategories as query parameters
+      const url = `../feed.php?category=Fitness&subcategory=${encodeURIComponent(selectedSubcategories)}`;
+
+      // Redirect to the feed.php page
+      window.location.href = url;
     }
   </script>
 

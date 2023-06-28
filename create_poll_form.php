@@ -29,7 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Move the uploaded images to the destination folder
     for ($i = 0; $i < $numOptions; $i++) {
         $imageTempPath = $_FILES['choice' . ($i + 1) . 'Image']['tmp_name'];
-        $imageName = $_FILES['choice' . ($i + 1) . 'Image']['name'];
+        $imageExtension = pathinfo($_FILES['choice' . ($i + 1) . 'Image']['name'], PATHINFO_EXTENSION);
+        $imageName = uniqid() . '.' . $imageExtension; // Generate a unique filename
         $imageDestinationPath = $destinationFolder . $imageName;
 
         move_uploaded_file($imageTempPath, $imageDestinationPath);

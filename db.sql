@@ -64,3 +64,12 @@ CREATE TABLE user_polls (
   FOREIGN KEY (user_id) REFERENCES users(user_id),
   FOREIGN KEY (poll_id) REFERENCES polls(poll_id)
 );
+
+-- Table: user_follows
+CREATE TABLE user_follows (
+  follower_id INT,
+  followed_id INT,
+  PRIMARY KEY (follower_id, followed_id),
+  FOREIGN KEY (follower_id) REFERENCES users(user_id),
+  FOREIGN KEY (followed_id) REFERENCES users(user_id)
+);

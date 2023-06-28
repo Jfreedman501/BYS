@@ -19,17 +19,31 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Search for usernames in the database
 if (isset($_GET['search'])) {
     $search = $_GET['search'];
-    $sql = "SELECT username FROM users WHERE username LIKE '$search%' ORDER BY num_followers DESC";
+    $sql = "SELECT username, profile_picture FROM users WHERE username LIKE '$search%' ORDER BY num_followers DESC";
     $result = $conn->query($sql);
     $usernames = [];
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            $usernames[] = $row['username'];
+            $profilePicture = $row['profile_picture'];
+            // Set the correct path for the profile picture
+            $profilePicturePath = "profile_pictures/$profilePicture";
+            if (file_exists($profilePicturePath)) {
+                $usernames[] = [
+                    'username' => $row['username'],
+                    'profile_picture' => $profilePicturePath
+                ];
+            } else {
+                // If the profile picture file does not exist, use a default image or display an alternative message
+                $usernames[] = [
+                    'username' => $row['username'],
+                    'profile_picture' => 'default_profile_picture.jpg' // Adjust with the path to the default image
+                ];
+            }
         }
     }
+    echo json_encode($usernames);
 }
 ?>
 
@@ -56,6 +70,26 @@ if (isset($_GET['search'])) {
             position: absolute;
             width: 100%;
         }
+        .profile-picture {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 10px;
+            margin-left: 2px; /* Add left margin for white space */
+        }
+
+
+        .dropdown-menu.search-results {
+            max-height: 250px; /* Adjust the max-height as needed */
+            overflow-y: auto;
+        }
+
+        .username {
+            font-size: 15px; /* Adjust the font size as needed */
+        }
+
+
     </style>
 </head>
 <body>
@@ -108,37 +142,68 @@ if (isset($_GET['search'])) {
 let xhr; // Declare xhr variable outside the function
 
 function updateDropdown(search) {
-  const dropdown = document.getElementById('username-dropdown');
-  dropdown.innerHTML = '';
+            const dropdown = document.getElementById('username-dropdown');
+            dropdown.innerHTML = '';
 
-  if (search.length === 0) {
-    dropdown.style.display = 'none'; // Hide the dropdown if the search query is empty
-    return;
-  }
+            if (search.length === 0) {
+                dropdown.style.display = 'none'; // Hide the dropdown if the search query is empty
+                return;
+            }
 
-  // Abort any ongoing XMLHttpRequest
-  if (xhr && xhr.readyState !== 4) {
-    xhr.abort();
-  }
+            // Abort any ongoing XMLHttpRequest
+            if (xhr && xhr.readyState !== 4) {
+                xhr.abort();
+            }
 
-  xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4 && xhr.status === 200) {
-      const usernames = JSON.parse(xhr.responseText);
-      if (usernames.length > 0) {
-        dropdown.style.display = 'block'; // Show the dropdown if there are matching usernames
-        usernames.forEach(function (username) {
-          const option = document.createElement('div');
-          option.textContent = username;
-          dropdown.appendChild(option);
-        });
-      } else {
-        dropdown.style.display = 'none'; // Hide the dropdown if no matching usernames found
-      }
-    }
-  };
-  xhr.open('GET', 'get_usernames.php?search=' + encodeURIComponent(search), true);
-  xhr.send();
+            xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const data = JSON.parse(xhr.responseText);
+                    if (data.length > 0) {
+                        dropdown.style.display = 'block'; // Show the dropdown if there are matching usernames
+                        data.forEach(function (user, index) {
+                        const option = document.createElement('a'); // Change the element to 'a' for hyperlink
+                        option.classList.add('dropdown-item'); // Add the 'dropdown-item' class
+
+                        // Set the href attribute with the profile.php page and the clicked username in the query string
+                        option.href = 'profile.php?username=' + encodeURIComponent(user.username);
+
+                        // Create a div element to wrap the profile picture and username
+                        const optionContent = document.createElement('div');
+                        optionContent.classList.add('d-flex', 'align-items-center'); // Add classes for flex layout
+
+                        // Create an image element for the profile picture
+                        const profilePic = document.createElement('img');
+                        profilePic.src = user.profile_picture;
+                        profilePic.alt = 'Profile Picture';
+                        profilePic.classList.add('profile-picture');
+                        optionContent.appendChild(profilePic);
+
+                        // Create a span element for the username
+                        const usernameSpan = document.createElement('span');
+                        usernameSpan.textContent = user.username;
+                        usernameSpan.classList.add('username'); // Add the 'username' class
+                        optionContent.appendChild(usernameSpan);
+
+                        // Add the optionContent to the option element
+                        option.appendChild(optionContent);
+
+                        // Add top border to separate the options
+                        if (index > 0) {
+                            option.style.borderTop = '1px solid #ccc';
+                            option.style.paddingTop = '5px';
+                            option.style.marginTop = '5px';
+                        }
+
+                        dropdown.appendChild(option);
+                        });
+                    } else {
+                        dropdown.style.display = 'none'; // Hide the dropdown if no matching usernames found
+                    }
+                }
+            };
+            xhr.open('GET', 'get_usernames.php?search=' + encodeURIComponent(search), true);
+            xhr.send();
 }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"

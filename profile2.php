@@ -24,41 +24,25 @@ try {
     exit();
 }
 
-$isOwnProfile = false; // Initialize the variable
-
+// Fetch the username, number of polls posted, number of followers, bio, and profile picture path for the active user
 try {
-    // Fetch the active user's username
-    $activeUserQuery = "SELECT username FROM users WHERE user_id = :user_id";
-    $activeUserStmt = $conn->prepare($activeUserQuery);
-    $activeUserStmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
-    $activeUserStmt->execute();
-    $activeUserResult = $activeUserStmt->fetch(PDO::FETCH_ASSOC);
-    $activeUsername = $activeUserResult['username'];
-    $activeUserStmt->closeCursor();
-
-    // Determine the username to fetch the profile data
-    $profileUsername = isset($_GET['username']) ? $_GET['username'] : $activeUsername;
-
     // Prepare the query
-    $query = "SELECT username, num_polls_posted, num_followers, bio, profile_picture FROM users WHERE username = :username";
+    $query = "SELECT username, num_polls_posted, num_followers, bio, profile_picture FROM users WHERE user_id = :user_id";
     $stmt = $conn->prepare($query);
 
-    // Bind the username parameter
-    $stmt->bindParam(':username', $profileUsername, PDO::PARAM_STR);
+    // Bind the user_id parameter
+    $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
 
     // Execute the query
     $stmt->execute();
 
-    // Fetch the user data
+    // Fetch the username, num_polls_posted, num_followers, bio, and profile_picture
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $activeUsername = $result['username'];
     $numPollsPosted = $result['num_polls_posted'];
-    $followers = $result['num_followers'];
-    $userID = $result['user_id'];
+    $numFollowers = $result['num_followers'];
     $bio = $result['bio'];
     $profilePicture = $result['profile_picture'];
-
-    // Check if the active user's username matches the username being visited
-    $isOwnProfile = $activeUsername === $profileUsername;
 
     // Close the cursor (no need to close the connection)
     $stmt->closeCursor();
@@ -67,24 +51,6 @@ try {
     echo "Failed to fetch user data: " . $e->getMessage();
     exit();
 }
-
-try {
-    // Check if the active user is following the profile being displayed
-    $followQuery = "SELECT COUNT(*) as count FROM user_follows WHERE follower_id = :follower_id AND followed_id = :followed_id";
-    $followStmt = $conn->prepare($followQuery);
-    $followStmt->bindParam(':follower_id', $_SESSION['user_id'], PDO::PARAM_INT);
-    $followStmt->bindParam(':followed_id', $userID, PDO::PARAM_INT);
-    $followStmt->execute();
-    $followResult = $followStmt->fetch(PDO::FETCH_ASSOC);
-    $isFollowing = $followResult['count'] > 0;
-    $followStmt->closeCursor();
-} catch (PDOException $e) {
-    // Handle query execution errors
-    echo "Failed to check if the user is following: " . $e->getMessage();
-    exit();
-}
-
-
 ?>
 
 <!doctype html>
@@ -147,18 +113,6 @@ try {
     background-color: #ccc;
     margin: 0 10px;
   }
-
-  .sticky-nav {
-      position: sticky;
-      top: 0;
-    }
-    .vertical-rule {
-      position: sticky;
-      top: 0;
-      height: 100vh; /* Adjust the height as needed */
-      background-color: #f9f9f9;
-      z-index: 1;
-    }
 
 
     /* CSS styles from display_poll.php */
@@ -247,27 +201,41 @@ try {
   </style>
 
   <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    var pollsPosted = <?php echo $numPollsPosted; ?>;
-    var followers = <?php echo $numFollowers; ?>;
+document.addEventListener("DOMContentLoaded", function() {
+  var pollsPosted = <?php echo $numPollsPosted; ?>;
+  var followers = <?php echo $numFollowers; ?>;
 
-    function formatNumber(number) {
-      if (number >= 1000000) {
-        return (number / 1000000).toFixed(1) + "M";
-      } else if (number >= 1000) {
-        return (number / 1000).toFixed(1) + "K";
-      } else {
-        return number.toString();
-      }
+  function formatNumber(number) {
+    if (number >= 1000000) {
+      return (number / 1000000).toFixed(1) + "M";
+    } else if (number >= 1000) {
+      return (number / 1000).toFixed(1) + "K";
+    } else {
+      return number.toString();
     }
+  }
 
-    var pollsPostedElement = document.getElementById("polls-posted");
-    var followersElement = document.getElementById("followers");
+  var pollsPostedElement = document.getElementById("polls-posted");
+  var followersElement = document.getElementById("followers");
 
-    pollsPostedElement.textContent = formatNumber(pollsPosted) + " Polls Posted";
-    followersElement.textContent = formatNumber(followers) + " Followers";
+  pollsPostedElement.textContent = formatNumber(pollsPosted) + " Polls Posted";
+  followersElement.textContent = formatNumber(followers) + " Followers";
+
+  var followButton = document.querySelector(".btn-group button");
+  followButton.addEventListener("click", function() {
+    if (followButton.classList.contains("btn-info")) {
+      followButton.classList.remove("btn-info");
+      followButton.classList.add("btn-secondary");
+      followButton.textContent = "Unfollow";
+    } else {
+      followButton.classList.remove("btn-secondary");
+      followButton.classList.add("btn-info");
+      followButton.textContent = "Follow";
+    }
   });
+});
 </script>
+
 
 </head>
 <body>
@@ -307,28 +275,26 @@ try {
         <div class="profile-details">
           <div class="d-flex align-items-center">
             <div class="profile-picture-container">
-              <img class="profile-picture" src="<?php echo $profilePicture ? 'profile_pictures/'.$profilePicture : 'profile_pictures/Ua7hHa0qhbnQiNV.jpg'; ?>" alt="Profile Picture">
+              <img class="profile-picture" src="<?php echo $profilePicture ? 'profile_pictures/'.$profilePicture : 'profile_pictures/default.jpg'; ?>" alt="Profile Picture">
             </div>
-          <div class="user-details">
-            <h2 class="user-name"><?php echo $profileUsername; ?></h2>
-              <?php if ($isOwnProfile): ?>
-  <div class="btn-group" role="group" aria-label="Profile Buttons">
-    <a href="edit_profile.php" class="btn btn-light btn-sm me-2 rounded">Edit Profile</a>
-    <a href="answered_polls.php" class="btn btn-light btn-sm rounded">Answered Polls</a>
-  </div>
-<?php else: ?>
-  <form action="<?php echo $isFollowing ? 'unfollow.php?username=' . urlencode($profileUsername) : 'follow.php?username=' . urlencode($profileUsername); ?>" method="post">
-    <button type="submit" class="btn btn-<?php echo $isFollowing ? 'secondary' : 'primary'; ?> btn-sm rounded">
-      <?php echo $isFollowing ? 'Unfollow' : 'Follow'; ?>
-    </button>
-  </form>
-<?php endif; ?>
+            <div class="user-details">
+              <h2 class="user-name"><?php echo $activeUsername; ?></h2>
+              <?php
+                // Check if the active user is following this profile
+                $following = false; // Replace this with your logic to determine if the active user is following this profile
 
+                if ($following) {
+                  echo '<button class="btn btn-secondary btn-sm rounded">Unfollow</button>';
+                } else {
+                  echo '<button class="btn btn-primary btn-sm me-2 rounded">Follow</button>';
+                }
+              ?>
+
+            </div>
           </div>
         </div>
-      </div>
 
-      <?php if (!empty($bio)): ?>
+        <?php if (!empty($bio)): ?>
           <div class="d-flex justify-content-center">
             <div class="card mb-3" style="width: 300px;">
               <div class="card-body p-2">
@@ -353,9 +319,6 @@ try {
           </div>
         </div>
 
-
-
-
         <hr class="my-4">
 
         <div class="polls-section">
@@ -368,16 +331,15 @@ try {
               die("Connection failed: " . mysqli_connect_error());
             }
 
-// Retrieve the polls for the active user from the table
-$query = "SELECT p.*, u.username FROM polls p
-          INNER JOIN users u ON p.user_id = u.user_id
-          WHERE u.username = :username
-          ORDER BY p.posted_timestamp DESC"; // Order by timestamp in descending order
-$stmt = $conn->prepare($query);
-$stmt->bindParam(':username', $profileUsername, PDO::PARAM_STR);
-$stmt->execute();
-$polls = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+            // Retrieve the polls for the active user from the table
+            $query = "SELECT p.*, u.username FROM polls p
+                      INNER JOIN users u ON p.user_id = u.user_id
+                      WHERE u.username = :username
+                      ORDER BY p.posted_timestamp DESC"; // Order by timestamp in descending order
+            $stmt = $conn->prepare($query);
+            $stmt->bindParam(':username', $activeUsername, PDO::PARAM_STR);
+            $stmt->execute();
+            $polls = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
             if (!empty($polls)) {
@@ -411,7 +373,7 @@ $polls = $stmt->fetchAll(PDO::FETCH_ASSOC);
               // Display the total votes
               echo '<p class="poll-votes">Total Votes: ' . $poll['total_responses'] . '</p>';
 
-              if ($isOwnProfile) {
+              if ($activeUsername === $poll['username']) {
                 // Display the delete button with a form
                 echo '<div style="display: flex; justify-content: flex-end;">';
                 echo '<form action="delete_poll.php" method="post">';
