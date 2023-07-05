@@ -40,16 +40,34 @@ if (isset($_GET['username'])) {
         $unfollowedUserId = $unfollowedUserResult['user_id'];
         $unfollowedUserStmt->closeCursor();
 
-        // Delete the corresponding record from the followers table
-        $unfollowQuery = "DELETE FROM followers WHERE follower_id = :follower_id AND following_id = :following_id";
-        $unfollowStmt = $conn->prepare($unfollowQuery);
-        $unfollowStmt->bindParam(':follower_id', $activeUserId, PDO::PARAM_INT);
-        $unfollowStmt->bindParam(':following_id', $unfollowedUserId, PDO::PARAM_INT);
-        $unfollowStmt->execute();
-        $unfollowStmt->closeCursor();
+        // Check if the active user is following the user to be unfollowed
+        $isFollowingQuery = "SELECT 1 FROM user_follows WHERE follower_id = :follower_id AND followed_id = :followed_id";
+        $isFollowingStmt = $conn->prepare($isFollowingQuery);
+        $isFollowingStmt->bindParam(':follower_id', $activeUserId, PDO::PARAM_INT);
+        $isFollowingStmt->bindParam(':followed_id', $unfollowedUserId, PDO::PARAM_INT);
+        $isFollowingStmt->execute();
+        $isFollowing = ($isFollowingStmt->rowCount() > 0);
+        $isFollowingStmt->closeCursor();
+
+        // If the active user is following, delete the record from the user_follows table
+        if ($isFollowing) {
+            $unfollowQuery = "DELETE FROM user_follows WHERE follower_id = :follower_id AND followed_id = :followed_id";
+            $unfollowStmt = $conn->prepare($unfollowQuery);
+            $unfollowStmt->bindParam(':follower_id', $activeUserId, PDO::PARAM_INT);
+            $unfollowStmt->bindParam(':followed_id', $unfollowedUserId, PDO::PARAM_INT);
+            $unfollowStmt->execute();
+            $unfollowStmt->closeCursor();
+
+            // Decrement the num_followers variable in the users table for the user who has been unfollowed
+            $decrementFollowedQuery = "UPDATE users SET num_followers = num_followers - 1 WHERE user_id = :unfollowed_id";
+            $decrementFollowedStmt = $conn->prepare($decrementFollowedQuery);
+            $decrementFollowedStmt->bindParam(':unfollowed_id', $unfollowedUserId, PDO::PARAM_INT);
+            $decrementFollowedStmt->execute();
+            $decrementFollowedStmt->closeCursor();
+        }
 
         // Redirect the user back to the profile page of the user they unfollowed
-        header("Location: profile.php?username=$unfollowedUsername");
+        header("Location: profile.php?username=" . urlencode($unfollowedUsername));
         exit();
     } catch (PDOException $e) {
         // Handle database query errors

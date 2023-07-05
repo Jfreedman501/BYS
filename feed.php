@@ -8,6 +8,17 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Check if the form is submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // Get the selected option and poll ID from the form
+  $option = $_POST['option'];
+  $pollId = $_POST['poll_id'];
+
+  // Redirect to poll_select.php with the selected option and poll ID as query parameters
+  header("Location: poll_select.php?option=$option&poll_id=$pollId");
+  exit();
+}
+
 // Establish a database connection (replace the placeholders with your own database credentials)
 $host = 'localhost';
 $db = 'dbntos1pjl9uqt';
@@ -270,47 +281,69 @@ $polls = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if (!empty($polls)) {
     foreach ($polls as $poll) {
-        // Display each poll
-        echo '<div class="poll-container">';
-        echo '<div class="poll-header">';
-        echo '<h2 class="poll-title">' . $poll['poll_title'] . '</h2>';
-        echo '<h3 class="poll-user">By: ' . $poll['username'] . '</h3>';
-        echo '</div>';
+                // Check if the user has already answered the poll
+                $query = "SELECT * FROM user_polls WHERE user_id = :user_id AND poll_id = :poll_id";
+                $stmt = $conn->prepare($query);
+                $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
+                $stmt->bindParam(':poll_id', $poll['poll_id'], PDO::PARAM_INT);
+                $stmt->execute();
+                $response = $stmt->fetch(PDO::FETCH_ASSOC);
+                $userHasAnswered = !empty($response);
 
-        // Display the dividing line
-        echo '<div class="poll-divider"></div>';
+                // Display each poll
+                echo '<div class="poll-container">';
+                echo '<div class="poll-header">';
+                echo '<h2 class="poll-title">' . $poll['poll_title'] . '</h2>';
+                echo '<h3 class="poll-user">By: ' . $poll['username'] . '</h3>';
+                echo '</div>';
 
-        // Display the poll images
-        echo '<div class="poll-images">';
-        for ($i = 1; $i <= $poll['num_options']; $i++) {
-            $image = 'poll_pictures/' . $poll['image' . $i];
-            echo '<img src="' . $image . '" alt="Option ' . $i . '">';
-        }
-        echo '</div>';
+                // Display the dividing line
+                echo '<div class="poll-divider"></div>';
 
-        // Display the dividing line
-        echo '<div class="poll-divider"></div>';
+                // Display the poll images
+                echo '<div class="poll-images">';
+                echo '<form action="" method="post">';
+                echo '<input type="hidden" name="poll_id" value="' . $poll['poll_id'] . '">';
+                for ($i = 1; $i <= $poll['num_options']; $i++) {
+                    $image = 'poll_pictures/' . $poll['image' . $i];
+                    echo '<button type="submit" name="option" value="' . $i . '">';
+                    // Check if the user has answered the poll
+                    if ($userHasAnswered) {
+                        // Apply styling for the gray cover and display the percentage of responses
+                        echo '<div style="position: relative;">';
+                        echo '<img src="' . $image . '" alt="Option ' . $i . '">';
+                        echo '<div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); text-align: center; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center;">';
+                        if ($poll['total_responses'] > 0) {
+                          $optionPercentage = ($poll['option' . $i . '_responses'] / $poll['total_responses']) * 100;
+                          echo round($optionPercentage, 2) . '%';
+                        } else {
+                          echo '0%';
+                        }
 
-        // Display the poll information
-        echo '<div class="poll-info">';
-        echo '<p>' . $poll['poll_description'] . '</p>';
-        echo '</div>';
+                        echo '</div>';
+                        echo '</div>';
+                    } else {
+                        // Display the image without any styling
+                        echo '<img src="' . $image . '" alt="Option ' . $i . '">';
+                    }
+                    echo '</button>';
+                }
+                echo '</form>';
+                echo '</div>';
 
-        // Display the total votes
-        echo '<p class="poll-votes">Total Votes: ' . $poll['total_responses'] . '</p>';
+                // Display the dividing line
+                echo '<div class="poll-divider"></div>';
 
-        if ($activeUsername === $poll['username']) {
-            // Display the delete button with a form
-            echo '<div style="display: flex; justify-content: flex-end;">';
-            echo '<form action="delete_poll.php" method="post">';
-            echo '<input type="hidden" name="poll_id" value="' . $poll['poll_id'] . '">';
-            echo '<button type="submit" class="btn btn-danger">Delete</button>';
-            echo '</form>';
-            echo '</div>';
-        }
+                // Display the poll information
+                echo '<div class="poll-info">';
+                echo '<p>' . $poll['poll_description'] . '</p>';
+                echo '</div>';
 
-        echo '</div>'; // Close poll-container
-    }
+                // Display the total votes
+                echo '<p class="poll-votes">Total Votes: ' . $poll['total_responses'] . '</p>';
+
+                echo '</div>'; // Close poll-container
+            }
 } else {
     echo 'There are no posted polls for this subcategory. Click "Create New" to make the first one!';
 }

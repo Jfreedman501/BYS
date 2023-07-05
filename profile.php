@@ -40,7 +40,7 @@ try {
     $profileUsername = isset($_GET['username']) ? $_GET['username'] : $activeUsername;
 
     // Prepare the query
-    $query = "SELECT username, num_polls_posted, num_followers, bio, profile_picture FROM users WHERE username = :username";
+    $query = "SELECT user_id, username, num_polls_posted, num_followers, bio, profile_picture FROM users WHERE username = :username";
     $stmt = $conn->prepare($query);
 
     // Bind the username parameter
@@ -51,6 +51,7 @@ try {
 
     // Fetch the user data
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $userID = $result['user_id'];
     $numPollsPosted = $result['num_polls_posted'];
     $followers = $result['num_followers'];
     $userID = $result['user_id'];
