@@ -8,6 +8,17 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Check if the form is submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // Get the selected option and poll ID from the form
+  $option = $_POST['option'];
+  $pollId = $_POST['poll_id'];
+
+  // Redirect to poll_select.php with the selected option and poll ID as query parameters
+  header("Location: poll_select.php?option=$option&poll_id=$pollId");
+  exit();
+}
+
 // Establish a database connection (replace the placeholders with your own database credentials)
 $host = 'localhost';
 $db = 'dbntos1pjl9uqt';
@@ -310,26 +321,25 @@ try {
             <div class="profile-picture-container">
               <img class="profile-picture" src="<?php echo $profilePicture ? 'profile_pictures/'.$profilePicture : 'profile_pictures/Ua7hHa0qhbnQiNV.jpg'; ?>" alt="Profile Picture">
             </div>
-          <div class="user-details">
-            <h2 class="user-name"><?php echo $profileUsername; ?></h2>
-              <?php if ($isOwnProfile): ?>
-  <div class="btn-group" role="group" aria-label="Profile Buttons">
-    <a href="edit_profile.php" class="btn btn-light btn-sm me-2 rounded">Edit Profile</a>
-    <a href="answered_polls.php" class="btn btn-light btn-sm rounded">Answered Polls</a>
-  </div>
-<?php else: ?>
-  <form action="<?php echo $isFollowing ? 'unfollow.php?username=' . urlencode($profileUsername) : 'follow.php?username=' . urlencode($profileUsername); ?>" method="post">
-    <button type="submit" class="btn btn-<?php echo $isFollowing ? 'secondary' : 'primary'; ?> btn-sm rounded">
-      <?php echo $isFollowing ? 'Unfollow' : 'Follow'; ?>
-    </button>
-  </form>
-<?php endif; ?>
-
+            <div class="user-details">
+              <h2 class="user-name"><?php echo $profileUsername; ?></h2>
+                <?php if ($isOwnProfile): ?>
+                  <div class="btn-group" role="group" aria-label="Profile Buttons">
+                    <a href="edit_profile.php" class="btn btn-light btn-sm me-2 rounded">Edit Profile</a>
+                    <a href="answered_polls.php" class="btn btn-light btn-sm rounded">Answered Polls</a>
+                  </div>
+                <?php else: ?>
+                  <form action="<?php echo $isFollowing ? 'unfollow.php?username=' . urlencode($profileUsername) : 'follow.php?username=' . urlencode($profileUsername); ?>" method="post">
+                    <button type="submit" class="btn btn-<?php echo $isFollowing ? 'secondary' : 'primary'; ?> btn-sm rounded">
+                      <?php echo $isFollowing ? 'Unfollow' : 'Follow'; ?>
+                    </button>
+                  </form>
+                <?php endif; ?>
+            </div>
           </div>
         </div>
-      </div>
 
-      <?php if (!empty($bio)): ?>
+        <?php if (!empty($bio)): ?>
           <div class="d-flex justify-content-center">
             <div class="card mb-3" style="width: 300px;">
               <div class="card-body p-2">
@@ -354,9 +364,6 @@ try {
           </div>
         </div>
 
-
-
-
         <hr class="my-4">
 
         <div class="polls-section">
@@ -369,60 +376,90 @@ try {
               die("Connection failed: " . mysqli_connect_error());
             }
 
-// Retrieve the polls for the active user from the table
-$query = "SELECT p.*, u.username FROM polls p
-          INNER JOIN users u ON p.user_id = u.user_id
-          WHERE u.username = :username
-          ORDER BY p.posted_timestamp DESC"; // Order by timestamp in descending order
-$stmt = $conn->prepare($query);
-$stmt->bindParam(':username', $profileUsername, PDO::PARAM_STR);
-$stmt->execute();
-$polls = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
+            // Retrieve the polls for the active user from the table
+            $query = "SELECT p.*, u.username FROM polls p
+                      INNER JOIN users u ON p.user_id = u.user_id
+                      WHERE u.username = :username
+                      ORDER BY p.posted_timestamp DESC"; // Order by timestamp in descending order
+            $stmt = $conn->prepare($query);
+            $stmt->bindParam(':username', $profileUsername, PDO::PARAM_STR);
+            $stmt->execute();
+            $polls = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             if (!empty($polls)) {
               foreach ($polls as $poll) {
-              // Display each poll
-              echo '<div class="poll-container">';
-              echo '<div class="poll-header">';
-              echo '<h2 class="poll-title">' . $poll['poll_title'] . '</h2>';
-              echo '<h3 class="poll-user">By: ' . $poll['username'] . '</h3>';
-              echo '</div>';
+                // Check if the user has already answered the poll
+                $query = "SELECT * FROM user_polls WHERE user_id = :user_id AND poll_id = :poll_id";
+                $stmt = $conn->prepare($query);
+                $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
+                $stmt->bindParam(':poll_id', $poll['poll_id'], PDO::PARAM_INT);
+                $stmt->execute();
+                $response = $stmt->fetch(PDO::FETCH_ASSOC);
+                $userHasAnswered = !empty($response);
+              
+                // Display each poll
+                echo '<div class="poll-container">';
+                echo '<div class="poll-header">';
+                echo '<h2 class="poll-title">' . $poll['poll_title'] . '</h2>';
+                echo '<h3 class="poll-user">By: ' . $poll['username'] . '</h3>';
+                echo '</div>';
 
-              // Display the dividing line
-              echo '<div class="poll-divider"></div>';
+                // Display the dividing line
+                echo '<div class="poll-divider"></div>';
 
-              // Display the poll images
-              echo '<div class="poll-images">';
-              for ($i = 1; $i <= $poll['num_options']; $i++) {
-                $image = 'poll_pictures/' . $poll['image' . $i];
-                echo '<img src="' . $image . '" alt="Option ' . $i . '">';
-              }
-              echo '</div>';
-
-              // Display the dividing line
-              echo '<div class="poll-divider"></div>';
-
-              // Display the poll information
-              echo '<div class="poll-info">';
-              echo '<p>' . $poll['poll_description'] . '</p>';
-              echo '</div>';
-
-              // Display the total votes
-              echo '<p class="poll-votes">Total Votes: ' . $poll['total_responses'] . '</p>';
-
-              if ($isOwnProfile) {
-                // Display the delete button with a form
-                echo '<div style="display: flex; justify-content: flex-end;">';
-                echo '<form action="delete_poll.php" method="post">';
+                // Display the poll images
+                echo '<div class="poll-images">';
+                echo '<form action="" method="post">';
                 echo '<input type="hidden" name="poll_id" value="' . $poll['poll_id'] . '">';
-                echo '<button type="submit" class="btn btn-danger">Delete</button>';
+                for ($i = 1; $i <= $poll['num_options']; $i++) {
+                  $image = 'poll_pictures/' . $poll['image' . $i];
+                  echo '<button type="submit" name="option" value="' . $i . '">';
+                  // Check if the user has answered the poll
+                  if ($userHasAnswered) {
+                    // Apply styling for the gray cover and display the percentage of responses
+                    echo '<div style="position: relative;">';
+                    echo '<img src="' . $image . '" alt="Option ' . $i . '">';
+                    echo '<div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); text-align: center; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center;">';
+                    if ($poll['total_responses'] > 0) {
+                      $optionPercentage = ($poll['option' . $i . '_responses'] / $poll['total_responses']) * 100;
+                      echo round($optionPercentage, 2) . '%';
+                    } else {
+                      echo '0%';
+                    }
+
+                    echo '</div>';
+                    echo '</div>';
+                  } else {
+                    // Display the image without any styling
+                    echo '<img src="' . $image . '" alt="Option ' . $i . '">';
+                  }
+                  echo '</button>';
+                }
                 echo '</form>';
                 echo '</div>';
-              }
 
-              echo '</div>'; // Close poll-container
+                // Display the dividing line
+                echo '<div class="poll-divider"></div>';
+
+                // Display the poll information
+                echo '<div class="poll-info">';
+                echo '<p>' . $poll['poll_description'] . '</p>';
+                echo '</div>';
+
+                // Display the total votes
+                echo '<p class="poll-votes">Total Votes: ' . $poll['total_responses'] . '</p>';
+
+                if ($isOwnProfile) {
+                  // Display the delete button with a form
+                  echo '<div style="display: flex; justify-content: flex-end;">';
+                  echo '<form action="delete_poll.php" method="post">';
+                  echo '<input type="hidden" name="poll_id" value="' . $poll['poll_id'] . '">';
+                  echo '<button type="submit" class="btn btn-danger">Delete</button>';
+                  echo '</form>';
+                  echo '</div>';
+                }
+
+                echo '</div>'; // Close poll-container
               }
             } else {
               echo 'No polls posted.';
@@ -432,9 +469,7 @@ $polls = $stmt->fetchAll(PDO::FETCH_ASSOC);
             mysqli_close($connection);
           ?>
         </div>
-
         <hr class="my-4">
-
       </div>
     </div>
   </div>

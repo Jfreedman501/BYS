@@ -76,7 +76,9 @@ function processFormSubmission($conn, $option, $pollId) {
     $stmt->execute();
 
     // Redirect back to following.php
-    header("Location: following.php");
+    if (isset($_SERVER["HTTP_REFERER"])) {
+        header("Location: " . $_SERVER["HTTP_REFERER"]);
+    }
     exit();
 }
 ?>

@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $updateStmt->execute();
 
         // You can redirect the user to a success page or perform any other desired action
-        header("Location: following.php");
+        header("Location: profile.php");
         exit();
     } else {
         // Failed to create the poll

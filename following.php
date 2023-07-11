@@ -256,6 +256,9 @@ try {
       </div>
       <div class="col-1 vertical-rule"></div>
       <div class="col-8 main-content">
+        <div class="following-header">
+          <h1 style="font-family: 'Bahnschrift SemiBold', sans-serif;">Following</h1>
+        </div>
 
         <hr class="my-4">
 
@@ -288,7 +291,7 @@ try {
                 echo '<div class="poll-container">';
                 echo '<div class="poll-header">';
                 echo '<h2 class="poll-title">' . $poll['poll_title'] . '</h2>';
-                echo '<h3 class="poll-user">By: ' . $poll['username'] . '</h3>';
+                echo '<h3 class="poll-user">By: <a href="profile.php?username=' . urlencode($poll['username']) . '" class="btn btn-primary btn-sm">' . $poll['username'] . '</a></h3>';
                 echo '</div>';
 
                 // Display the dividing line

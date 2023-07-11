@@ -216,7 +216,21 @@ try {
       background-color: #f9f9f9;
       z-index: 1;
     }
+    .feed-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Bahnschrift SemiBold', sans-serif;
+      font-size: 20px;
+      margin-bottom: 5px;
+    }
 
+    .subcategory-list {
+      text-align: center;
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 20px;
+    }
 
   </style>
 </head>
@@ -253,6 +267,23 @@ try {
       </div>
       <div class="col-1 vertical-rule"></div>
       <div class="col-8 main-content">
+      <div class="feed-header">
+      <h1 style="font-family: 'Bahnschrift SemiBold', sans-serif;">Feed</h1>
+    </div>
+
+    <?php
+// Retrieve the category and subcategories from the query string
+$category = isset($_GET['category']) ? $_GET['category'] : '';
+$subcategories = isset($_GET['subcategory']) ? explode(',', $_GET['subcategory']) : array();
+
+// Display the category and subcategories
+echo '<div class="subcategory-list">';
+echo '<p>Category: ' . $category . '</p>';
+echo '<p>Subcategories: ';
+echo implode(', ', $subcategories);
+echo '</p>';
+echo '</div>';
+?>
 
         <hr class="my-4">
 
@@ -294,7 +325,7 @@ if (!empty($polls)) {
                 echo '<div class="poll-container">';
                 echo '<div class="poll-header">';
                 echo '<h2 class="poll-title">' . $poll['poll_title'] . '</h2>';
-                echo '<h3 class="poll-user">By: ' . $poll['username'] . '</h3>';
+                echo '<h3 class="poll-user">By: <a href="profile.php?username=' . urlencode($poll['username']) . '" class="btn btn-primary btn-sm">' . $poll['username'] . '</a></h3>';
                 echo '</div>';
 
                 // Display the dividing line
